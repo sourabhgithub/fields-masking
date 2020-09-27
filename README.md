@@ -18,18 +18,6 @@ ObjectMapper mapper = new ObjectMapper().registerModule(new JsonViewModule());
 ```
 ### Exclusion
 
-The most common use case for this is when you have an object with an expensive (big) field on it. You may not always want to serialize it. Let's say that you've got this class:
-
-```java
-public class MyObject{
-  private Long id;
-  private String name;
-  private MySmallObject smallObj;
-  private List<MyBigObject> contains;       //expensive list with many entries
-
-  //getters and setters and/or builder
-}
-```
 
 If you were to return a list of `MyObject`, you may not want to show the `contains` field; with *n* instances of `MyObject` and *m* instances of `MyBigObject` per instance of `MyObject`, you'll be returning n\*m instances.
 
@@ -38,42 +26,66 @@ The typically suggested pattern suggests using the `@JsonIgnore` annotation on t
 Using `JsonView` allows you to filter this field out quickly and easily:
 
 ```java
+
+@Data
+public class Contact {
+
+  public String name;
+
+  public String company;
+
+  public String profileImage;
+
+  @JsonFormat(pattern = "yyyy-MM-dd")
+  public String birthDate;
+
+  public Phone phoneNumber;
+
+  public String email;
+
+  public Address address;
+}
+
 import com.sample.masking.json.JsonView;
 import static com.sample.masking.json.Match.match;
+ private static final String contactFields[] = {"profileImage",address};
 
-//get a list of the objects
-List<MyObject> list = myObjectService.list();
-
-//exclude expensive field
-String json = mapper.writeValueAsString(JsonView.with(list).onClass(MyObject.class, match().exclude("contains")));
+ Contact byId = getById(id);
+        String response = mapper.writeValueAsString(JsonView.with(byId).onClass(Contact.class, match().exclude(contactFields)));
 ```
 
-### Inclusion
+### List Exclusion
 
-The inverse of this is also possible. For example, let's say this was your class instead:
+The List of this is also possible. For example, let's say you want to remove the list of objects and inside the list:
 
 ```java
-public class MyObject{
-  private Long id;
-  private String name;
-  private MySmallObject smallObj;
-  @JsonIgnore
-  private List<MyBigObject> contains;       //expensive list with many entries
 
-  //getters and setters and/or builder
+@Data
+public class Contact {
+
+  public String name;
+
+  public String company;
+
+  public String profileImage;
+
+  @JsonFormat(pattern = "yyyy-MM-dd")
+  public String birthDate;
+
+  public Phone phoneNumber;
+
+  public String email;
+
+  public Address address;
 }
 ```
 
-You can programmatically include fields that are ignored by default:
-
-
 ```java
 import com.sample.masking.json.JsonView;
 import static com.sample.masking.json.Match.match;
 
-//get a list of the objects
-List<MyObject> list = myObjectService.list();
 
-//exclude expensive field
-String json = mapper.writeValueAsString(JsonView.with(list).onClass(MyObject.class, match().include("contains")));
+private static final String addressFields[] = {"address.city"};
+List<Contact> allContacts = findAllContacts();
+String response = mapper.writeValueAsString(JsonView.with(allContacts).onClass(Contact.class, match().exclude(addressFields)));
 ```
