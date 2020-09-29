@@ -30,3 +30,34 @@ maven-wrapper.jar
 maven-wrapper.properties
 mvnw
 mvnw.cmd
+
+.gradle
+/bin/
+/build/
+!gradle/wrapper/gradle-wrapper.jar
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+/out/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### Whatever Khai and David are using ###
+/bin/

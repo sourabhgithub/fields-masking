@@ -1,5 +1,4 @@
 package com.sample.masking.service;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sample.masking.dto.Address;
 import com.sample.masking.dto.Contact;
@@ -10,9 +9,9 @@ import com.sample.masking.json.JsonViewModule;
 import com.sample.masking.repository.PersonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.fasterxml.jackson.core.type.TypeReference;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -29,16 +28,10 @@ public class ContactService {
     @Autowired
     PersonRepository personRepository;
 
-    private static final String contactFields[] = {"profileImage"};
-    private static final String addressFields[] = {"address.city"};
-
-    public Optional<String> findById(Long id) throws IOException {
+    public Optional<Contact> findById(Long id) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
         Contact byId = getById(id);
-        String response = mapper.writeValueAsString(JsonView.with(byId).onClass(Contact.class, match().exclude(contactFields)));
-
-        //In case we need to remove from chile object
-       // String response = mapper.writeValueAsString(JsonView.with(byId).onClass(Address.class, match().exclude(removeFields)));
-        return Optional.of(response);
+        Contact contact = byId.maskedContactDto(byId, Contact.MIN);
+        return Optional.of(contact);
     }
 
 
@@ -46,10 +39,8 @@ public class ContactService {
     public Optional<String> findAll() throws IOException {
 
         List<Contact> allContacts = findAllContacts();
-        String response = mapper.writeValueAsString(JsonView.with(allContacts).onClass(Contact.class, match().exclude(addressFields)));
+        String response = mapper.writeValueAsString(JsonView.with(allContacts).onClass(Contact.class, match().exclude(null)));
 
-        //In case we need to remove from chile object
-        // String response = mapper.writeValueAsString(JsonView.with(byId).onClass(Address.class, match().exclude(removeFields)));
         return Optional.of(response);
 
     }

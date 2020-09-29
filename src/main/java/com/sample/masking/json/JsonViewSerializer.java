@@ -28,7 +28,7 @@ import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
 
-public class JsonViewSerializer extends JsonSerializer<com.sample.masking.json.JsonView> {
+public class JsonViewSerializer extends JsonSerializer<JsonView> {
   public static boolean log = false;
   /**
    * Cached results from expensive (pure) methods

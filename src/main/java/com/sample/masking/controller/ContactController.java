@@ -22,8 +22,8 @@ public class ContactController {
     private ContactService contactService;
 
     @RequestMapping(value = "/contact/{id}", method = RequestMethod.GET)
-    String getContact(@PathVariable Long id) throws InvocationTargetException, IOException {
-        Optional<String> contact = contactService.findById(id);
+    Contact getContact(@PathVariable Long id) throws InvocationTargetException, IOException, NoSuchMethodException, IllegalAccessException {
+        Optional<Contact> contact = contactService.findById(id);
       return contact.get();
     }
 
